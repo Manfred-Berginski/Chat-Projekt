@@ -19,7 +19,7 @@ await db.read();
 if (!db.data) {
   db.data = { messages: [] };
   await db.write();
-  console.log('✅ Neue Datenbankstruktur erstellt!');
+  console.log('✅ Neue Datenbank erstellt!');
 } else {
   console.log('✅ Datenbank geladen!');
 }
