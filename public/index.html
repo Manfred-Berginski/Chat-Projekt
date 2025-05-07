@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">💬 Mein Chat</div>
+    <div id="messages" class="chat-messages"></div>
+    <form id="chat-form" class="chat-form">
+      <input type="text" id="username" placeholder="Name" required />
+      <input type="text" id="message-input" placeholder="Nachricht..." autocomplete="off" required />
+      <button type="submit">Senden</button>
+    </form>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    
+    const messagesContainer = document.getElementById('messages');
+    const form = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const usernameInput = document.getElementById('username');
+    
+    // Nachrichten anzeigen
+    function appendMessage(msg) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('chat-message');
+        msgDiv.innerHTML = `<strong>${msg.username}:</strong> ${msg.text}`;
+        messagesContainer.appendChild(msgDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+    
+    // Alte Nachrichten laden
+    socket.on('initMessages', (msgs) => {
+        msgs.forEach(appendMessage);
+    });
+    
+    // Neue Nachrichten empfangen
+    socket.on('chatMessage', (msg) => {
+        appendMessage(msg);
+    });
+    
+    
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        const username = usernameInput.value.trim() || 'Anonym';
+        if (message) {
+            socket.emit('chatMessage', { text: message, username });
+            messageInput.value = '';
+        }
+    });
+    
+    /* // Emoji-Button
+    
+    <button id="emoji-button">😊</button>
+    <inputt type="text" id="message-input" placeholder="Nachricht..."> */
+    
+    </script>
+</body>
+</html>
